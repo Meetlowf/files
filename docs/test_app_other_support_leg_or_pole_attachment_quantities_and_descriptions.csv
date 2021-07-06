@@ -1,0 +1,2 @@
+fulcrum_id,fulcrum_parent_id,fulcrum_record_id,version,latitude,longitude,geometry,created_at,updated_at,created_by,updated_by,other_support_leg_or_pole
+6bfb490f-d68c-48d8-95f3-5507f628a102,c1270b8b-67e0-4857-b82f-3c34145efdc1,c1270b8b-67e0-4857-b82f-3c34145efdc1,1,0.001545,0.003498,POINT (0.003498 0.001545),2020-10-27 19:45:03 UTC,2020-10-27 19:45:03 UTC,mike.a.king@wv.gov,mike.a.king@wv.gov,Right Support Leg: 1 sensor
