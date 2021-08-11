@@ -1,26 +1,30 @@
 import os
-
 import pandas as pd
 # import PyPDF2
 import pdfkit
 
+# file directory
 files = os.listdir("docs/")
 files.sort()
 
+# create an HTML output file
 f = open("result.html", "w")
 
 test = f"<head> <link rel=\"stylesheet\" href=\"main.css\"></head>"
 num = 0
 listOfNames= []
+
+# loop through all the files in the directory
 for f1 in files:
     # print("filename: " + f1)
-    # print(num)
+
     if num > 0:
         listOfNames.append(f1)
     
     file = pd.read_csv("docs/" + f1)
+    # drop empty cells
     file.dropna(how='all', axis=1, inplace=True)
-
+    # drop all the columns that are not needed
     file.drop(['fulcrum_record_id', 'version', 'created_at', 'updated_at', 'created_by', 'updated_by'], axis=1, inplace=True, errors='ignore')
     file.drop(['system_created_at', 'system_updated_at', 'latitude', 'longitude', 'geometry'], axis=1, inplace=True, errors='ignore')
     file.drop(['state_project_number_example_s320', 'state_project_number_example_60'], axis=1, inplace=True, errors='ignore')
@@ -33,7 +37,7 @@ for f1 in files:
     file.drop(['exif_gps_latitude_ref', 'exif_gps_longitude', 'exif_gps_longitude_ref'], axis=1, inplace=True, errors='ignore')
     file.drop(['exif_make', 'exif_model', 'exif_pixel_x_dimension', 'exif_pixel_y_dimension', 'exif_software'], axis=1, inplace=True, errors='ignore')
     file.drop(['exif_x_resolution', 'exif_y_resolution'], axis=1, inplace=True, errors='ignore')
-
+    # remove the last part of the column name after the last underscore
     result = f1.rsplit('_', 1)[1]
     result = result.rsplit('.', 1)[0]
 
@@ -41,14 +45,7 @@ for f1 in files:
         if column.find(result) != -1:
             firstHalf = column.rsplit('_', 1)[0]
             file.rename(columns={column: firstHalf}, inplace=True)
-
-
-    # if num == 1:
-    #     previousfile = file
-
-    # if num == 2:
-    #     nextfile = file
-
+    # switch current words for abbreviation 
     for column in file.columns:
         tempCol = column
         file.rename(columns={tempCol: tempCol.replace("anchorconnection", "achcntn")}, inplace=True)
@@ -262,11 +259,7 @@ for f1 in files:
         file.rename(columns={tempCol: tempCol.replace("foundation", "fdn")}, inplace=True)
         tempCol = tempCol.replace("foundation", "fdn")
 
-
-    # for column in file.columns:
-    #     if (len(column) > 60):
-    #         print("long: " + column + "\t" + str(len(column)))
-
+    # combine all the children files into a large CSV 
     if num > 0:
         if num == 1:
             previousFile = file
@@ -276,21 +269,13 @@ for f1 in files:
                 previousFile.insert(0, "File Names", listOfNames)
                 previousFile.to_csv('childrenTable.csv')
 
+    # create a nicely formatted HTML with selective page breaks
     num += 1
     test += f"<h2>{f1}</h2>"
     test += file.melt().to_html(index=False)
     if(num == 2 or num == 5 or num == 9 or num == 13 or num == 17 or num == 21 or num == 25 or num == 29 or num == 33 or num == 37 or num == 42 or num == 46 or num == 50):  #  num % 2 != 0 (num % 3 == 0) or (num == 0)
         test += f"<p style=\"page-break-before: always\">"
     
-    
-# previousfile = pd.read_csv("docs/test_app_additional_comments_pse13.csv")
-# nextfile = pd.read_csv("docs/test_app_additional_comments_sse21.csv")
-
-# print(previousfile)
-# print(nextfile)
-# bruh = pd.concat([previousfile, nextfile], ignore_index=True, sort=False)
-# bruh.to_csv('testing.csv')
-
 
 f.write(test)
 css = 'main.css'
